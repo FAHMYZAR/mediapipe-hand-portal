@@ -1,0 +1,4 @@
+# Server hanya menyajikan file statis + /api/health.
+# Deteksi jalan di browser (MediaPipe Tasks JS), jadi mediapipe dan
+# opencv tidak lagi dibutuhkan di server.
+flask>=3.0,<4

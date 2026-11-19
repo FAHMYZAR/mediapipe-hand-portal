@@ -1,0 +1,438 @@
+/* Tracking: simple, satu aksen warna untuk status terdeteksi. */
+
+:root {
+  --bg: #ffffff;
+  --surface: #f4f4f2;
+  --text: #1a1a1a;
+  --muted: #5c5c5c;
+  --border: #d8d8d4;
+  --accent: #1a7f37;
+  --accent-text: #ffffff;
+  --danger: #b3261e;
+  --focus: #1a7f37;
+}
+
+[data-theme="dark"] {
+  --bg: #141414;
+  --surface: #1e1e1e;
+  --text: #ececec;
+  --muted: #a8a8a8;
+  --border: #3a3a3a;
+  --accent: #3fb950;
+  --accent-text: #0b1410;
+  --danger: #ff8a80;
+  --focus: #3fb950;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.top {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 16px 8px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px 16px calc(32px + env(safe-area-inset-bottom, 0px));
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Logo mark: segi empat portal + 4 titik ujung jari. Motif identitas:
+   bentuk ini adalah gestur inti produk, bukan hiasan. */
+.logo {
+  flex: none;
+  color: var(--accent);
+}
+
+button {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 120ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+button svg { flex: none; }
+
+/* Umpan balik tekan: tombol mengecil sedikit saat ditekan, supaya tap
+   di HP terasa terdaftar. Tidak menggeser layout. */
+button:active:not(:disabled) { transform: scale(0.97); }
+
+button:hover:not(:disabled) { border-color: var(--muted); }
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+#startBtn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+#stopBtn {
+  background: transparent;
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.stage-wrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.stage-wrap video,
+.stage-wrap canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Video asli disembunyikan: yang tampil hanya canvas hasil render. */
+.stage-wrap video { display: none; }
+
+/* Layar penuh: panggung isi seluruh layar, tanpa sudut/border. */
+.stage-wrap:fullscreen,
+.stage-wrap:-webkit-full-screen {
+  aspect-ratio: auto;
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+  border-radius: 0;
+  background: #000;
+}
+
+.mode-line {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Nama filter aktif di tengah layar, muncul sebentar tiap kali berganti. */
+.filter-toast {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  margin: 0;
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.filter-toast.fading { opacity: 0; }
+
+/* Overlay loading dan error di atas panggung kamera. */
+/* Atribut hidden wajib menang: tanpa ini, .overlay di bawah (display:flex)
+   menimpa aturan bawaan browser dan overlay tidak pernah hilang. */
+[hidden] { display: none !important; }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.88);
+  color: #fff;
+}
+
+.overlay p { margin: 0; }
+
+.overlay-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.overlay-sub {
+  font-size: 14px;
+  color: #d4d4d4;
+}
+
+.error-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ff8a80;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #22c55e;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Bar progres muat model: lebarnya mengikuti tahap nyata, bukan animasi. */
+.load-bar {
+  width: 220px;
+  max-width: 80%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#loadBarFill {
+  height: 100%;
+  width: 0;
+  background: #4ade80;
+  border-radius: 3px;
+  transition: width 200ms ease;
+}
+
+/* Banner masuk: geser sedikit ke bawah + fade, supaya perubahan status
+   terlihat tanpa mengganggu. */
+.banner:not([hidden]) { animation: banner-in 180ms ease-out; }
+
+@keyframes banner-in {
+  from { opacity: 0; transform: translate(-50%, -6px); }
+}
+
+/* Banner notifikasi gestur di tengah atas panggung. */
+.banner {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  max-width: 92%;
+  margin: 0;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #22c55e;
+  color: #000;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+/* Progres tahan gestur: terisi selama kode jari di-debounce (~1 dtk)
+   sebelum amunisi berganti. Hanya tampil saat ada kandidat aktif. */
+.hold-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 48px;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.hold-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#holdFill {
+  height: 100%;
+  width: 0;
+  background: #4ade80;
+}
+
+/* Bar instruksi gestur di bawah panggung. */
+.instruction {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 94%;
+  z-index: 2;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fde047;
+  font-size: 12px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.filter-line {
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+
+.stage-message {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.status {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.status > div {
+  flex: 1;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.status .label {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.status strong { font-size: 20px; }
+
+/* Bar FPS: lebarnya = FPS terhadap target 45, diukur dari frame deteksi. */
+.fps-bar {
+  height: 4px;
+  margin-top: 6px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#fpsFill {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width 300ms ease;
+}
+
+.status strong.on { color: var(--accent); }
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.error {
+  margin-top: 16px;
+  padding: 12px 14px;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+}
+
+/* Panduan gestur ringkas: satu baris per gestur, kata kerja saja. */
+.guide {
+  margin-top: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.guide-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.guide-row svg {
+  flex: none;
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .status { flex-direction: column; }
+  h1 { font-size: 24px; }
+}
