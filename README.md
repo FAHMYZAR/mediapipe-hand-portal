@@ -2,22 +2,27 @@
 
 Portal filter dari gerakan tangan.
 
-![Portal THERMAL aktif](docs/portal-thermal.png)
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://tracking.owebku.site)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![MediaPipe Hands](https://img.shields.io/badge/MediaPipe-Hands-009688)](https://developers.google.com/mediapipe/solutions/vision/hand_landmarker)
+[![Python](https://img.shields.io/badge/Python-3-3776AB)](https://www.python.org)
 
-Demo live: https://tracking.owebku.site
+![Portal THERMAL aktif, dua tangan membuka portal segi empat](docs/portal-thermal.png)
 
-HandPortal membuka kamera dan menjalankan MediaPipe Hands langsung di browser. Dua tangan dibuka membentuk portal segi empat, area di dalamnya kena filter, luar tetap normal. Frame video tidak pernah keluar dari HP.
+**Demo live:** https://tracking.owebku.site
 
-![Tampilan HandPortal](docs/ui.png)
+HandPortal membuka kamera dan menjalankan MediaPipe Hands langsung di browser. Buka dua tangan, portal segi empat muncul, area di dalamnya kena filter, luar tetap normal. Frame video tidak pernah keluar dari HP.
 
 ## Fitur
 
 - Portal 2 tangan dan portal 1 tangan
-- 7 filter portal: THERMAL, CYBER, NEGATIVE, DUAL-TONE, PIXELATE, GLITCH, RAINBOW-WAVE
+- 7 filter portal
 - Ketapel: tembak filter ke fullscreen
 - Mode 3D: dua poligon, dua filter sekaligus
 - Screenshot PNG, layar penuh, light/dark
 - Target 45 fps, deteksi jalan di browser
+
+![Tampilan aplikasi HandPortal](docs/ui.png)
 
 ## Gerakan
 
@@ -29,6 +34,18 @@ HandPortal membuka kamera dan menjalankan MediaPipe Hands langsung di browser. D
 | Cubit jempol-kelingking | Ganti filter |
 | Pistol kiri + cubit kanan, lepas | Tembak filter ke layar |
 | Kepal 2 tangan | Reset layar |
+
+## Filter
+
+| Filter | Cara kerja |
+| --- | --- |
+| THERMAL | Peta panas dari luminansi |
+| CYBER | Neon magenta dan cyan |
+| NEGATIVE | Inversi warna |
+| DUAL-TONE | Threshold 110, oranye dan ungu |
+| PIXELATE | Blok 14px |
+| GLITCH | Geser channel R/B + baris noise |
+| RAINBOW-WAVE | Sinus + waktu, beranimasi |
 
 ## Jalanin lokal
 
